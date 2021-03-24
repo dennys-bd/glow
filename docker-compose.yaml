@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  db:
+    image: "postgres:11.4-alpine"
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: glow
+    volumes:
+      - .db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d glow"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    links:
+        - db
+    ports:
+        - "5566:80"
+    environment:  
+      PGADMIN_DEFAULT_EMAIL: admin@email.com
+      PGADMIN_DEFAULT_PASSWORD: admin123456
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+    ports:
+      - "8080:80"
+    env_file: .env
+    command: go run server.go
+    depends_on:
+      db:
+        condition: service_healthy
