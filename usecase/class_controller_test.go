@@ -17,6 +17,7 @@ import (
 	"github.com/dennys-bd/glow/ops/projectpath"
 	"github.com/dennys-bd/glow/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/khaiql/dbcleaner.v2"
 	"gopkg.in/khaiql/dbcleaner.v2/engine"
@@ -121,6 +122,7 @@ func (s *ClassesSuite) TestClassesCreation() {
 	buildClass := factories.ClassFactory.MustCreate().(*entity.Class)
 	expectedClass := PostClass{
 		Name:      buildClass.Name,
+		Capacity:  buildClass.Capacity,
 		StartDate: buildClass.StartDate,
 		EndDate:   buildClass.EndDate,
 	}
@@ -142,4 +144,62 @@ func (s *ClassesSuite) TestClassesCreation() {
 	s.Equal(expectedClass.StartDate, dataClass.Class.StartDate)
 	s.Equal(expectedClass.EndDate, dataClass.Class.EndDate)
 	s.NotZero(dataClass.Class.ID)
+}
+
+func (s *ClassesSuite) TestClassesCreation_BadParameters() {
+
+	postClass := PostClass{}
+	reqBody := Must(json.Marshal(postClass)).([]byte)
+
+	w := httptest.NewRecorder()
+	req := Must(http.NewRequest("POST", "/api/classes", bytes.NewBuffer(reqBody))).(*http.Request)
+	s.routes.ServeHTTP(w, req)
+
+	r := bytes.NewReader(w.Body.Bytes())
+	decoder := json.NewDecoder(r)
+	var dataClass DataClass
+	if err := decoder.Decode(&dataClass); err != nil {
+		panic(err)
+	}
+
+	err := validator.New().Struct(Class{})
+	expectedResponse := Must(json.Marshal(map[string]interface{}{"error": err.Error()})).([]byte)
+
+	s.Equal(http.StatusBadRequest, w.Code)
+	s.Equal(string(expectedResponse), w.Body.String())
+}
+
+func (s *ClassesSuite) TestClassesCreation_BadParametersEndDate() {
+
+	buildClass := factories.ClassFactory.MustCreate().(*entity.Class)
+	postClass := PostClass{
+		Name:      buildClass.Name,
+		Capacity:  buildClass.Capacity,
+		StartDate: buildClass.EndDate,
+		EndDate:   buildClass.StartDate,
+	}
+	reqBody := Must(json.Marshal(postClass)).([]byte)
+
+	w := httptest.NewRecorder()
+	req := Must(http.NewRequest("POST", "/api/classes", bytes.NewBuffer(reqBody))).(*http.Request)
+	s.routes.ServeHTTP(w, req)
+
+	r := bytes.NewReader(w.Body.Bytes())
+	decoder := json.NewDecoder(r)
+	var dataClass DataClass
+	if err := decoder.Decode(&dataClass); err != nil {
+		panic(err)
+	}
+
+	validateClass := Class{
+		Name:      buildClass.Name,
+		Capacity:  buildClass.Capacity,
+		StartDate: buildClass.EndDate,
+		EndDate:   buildClass.StartDate,
+	}
+	err := validator.New().Struct(validateClass)
+	expectedResponse := Must(json.Marshal(map[string]interface{}{"error": err.Error()})).([]byte)
+
+	s.Equal(http.StatusBadRequest, w.Code)
+	s.Equal(string(expectedResponse), w.Body.String())
 }
