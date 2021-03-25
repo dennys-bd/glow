@@ -22,6 +22,18 @@ func InjectClassController() (usecase.ClassController, error) {
 	return classController, nil
 }
 
+func InjectBookingController() (usecase.BookingController, error) {
+	bookingRepository := repository.ProvideBookingRepo()
+	classRepository := repository.ProvideClassRepo()
+	bookingController, err := usecase.ProvideBookingCtrl(bookingRepository, classRepository)
+	if err != nil {
+		return usecase.BookingController{}, err
+	}
+	return bookingController, nil
+}
+
 // wire.go:
 
 var classRepoSet = wire.NewSet(repository.ProvideClassRepo, wire.Bind(new(repository.ClassRepoInf), new(repository.ClassRepository)))
+
+var bookingRepoSet = wire.NewSet(repository.ProvideBookingRepo, wire.Bind(new(repository.BookingRepoInf), new(repository.BookingRepository)))

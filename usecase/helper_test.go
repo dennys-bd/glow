@@ -22,7 +22,7 @@ type Class struct {
 	Capacity  uint      `validate:"required"`
 	Name      string    `validate:"required"`
 	StartDate time.Time `validate:"required"`
-	EndDate   time.Time `validate:"required,gtecsfield=StartDate"`
+	EndDate   time.Time `validate:"required,gtefield=StartDate"`
 }
 
 func Must(i interface{}, err error) interface{} {

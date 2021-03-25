@@ -13,9 +13,22 @@ var classRepoSet = wire.NewSet(
 	wire.Bind(new(repository.ClassRepoInf), new(repository.ClassRepository)),
 )
 
+var bookingRepoSet = wire.NewSet(
+	repository.ProvideBookingRepo,
+	wire.Bind(new(repository.BookingRepoInf), new(repository.BookingRepository)),
+)
+
 func InjectClassController() (usecase.ClassController, error) {
 	panic(wire.Build(
 		classRepoSet,
 		usecase.ProvideClassCtrl,
+	))
+}
+
+func InjectBookingController() (usecase.BookingController, error) {
+	panic(wire.Build(
+		bookingRepoSet,
+		classRepoSet,
+		usecase.ProvideBookingCtrl,
 	))
 }
