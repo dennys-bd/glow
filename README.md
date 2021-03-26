@@ -42,7 +42,7 @@ You have the opition to run everything on docker or locally
 
 2 endpoints were created as requested
 
-`/api/classes` to classes with `GET, POST` methods and `/:id` with `GET` method
+`/api/classes` to classes with `GET, POST` methods and `/:id` with `GET` method 
 `/api/bookings` to classes with `GET, POST` methods and `/:id` with `GET, DELETE` methods
 
 These endpoints are better documented on postman [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/c4dfa10a25252877c45d)
