@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-gormigrate/gormigrate/v2"
 )
 
-const defaultPort = "80"
+const defaultPort = "8080"
 
 func main() {
 	port := os.Getenv("PORT")

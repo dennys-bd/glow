@@ -32,7 +32,7 @@ services:
     build:
       context: .
     ports:
-      - "8080:80"
+      - "8080:8080"
     env_file: .env
     command: go run server.go
     depends_on:
