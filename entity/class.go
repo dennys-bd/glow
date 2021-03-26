@@ -12,5 +12,5 @@ type Class struct {
 	StartDate time.Time `json:"start_date" binding:"required"`
 	EndDate   time.Time `json:"end_date" binding:"required,gtefield=StartDate"`
 
-	Bookings []Booking `json:"bookings,omitempty"`
+	Bookings []*Booking `json:"bookings,omitempty"`
 }

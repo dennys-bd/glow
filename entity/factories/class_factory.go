@@ -6,18 +6,7 @@ import (
 	"github.com/Pallinder/go-randomdata"
 	"github.com/bluele/factory-go/factory"
 	"github.com/dennys-bd/glow/entity"
-	"gorm.io/gorm"
 )
-
-type key int
-
-const (
-	DBContextKey key = iota
-	// ...
-)
-
-var timeToStringLayout = "2006-01-02"
-var stringToTimeLayout = "Monday 2 Jan 2006"
 
 type ClassGroup struct {
 	Classes []*entity.Class
@@ -39,16 +28,10 @@ var ClassFactory = factory.NewFactory(
 	future := first.AddDate(0, 0, 10)
 	date := randomdata.FullDateInRange(first.Format(timeToStringLayout), future.Format(timeToStringLayout))
 	return time.Parse(stringToTimeLayout, date)
-}).OnCreate(func(args factory.Args) error {
-	if ctx := args.Context().Value(DBContextKey); ctx != nil {
-		db := ctx.(*gorm.DB)
-		return db.Create(args.Instance()).Error
-	}
-	return nil
-})
+}).OnCreate(createHandler)
 
 var ClassGroupFactory = factory.NewFactory(
 	&ClassGroup{},
 ).SubSliceFactory("Classes", ClassFactory, func() int {
-	return randomdata.Number(5)
+	return randomdata.Number(1, 5)
 })

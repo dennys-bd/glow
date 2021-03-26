@@ -59,8 +59,9 @@ func (c *BookingController) Create(ctx *gin.Context) {
 	class, err := c.cr.Find(booking.ClassID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	booking.Class = *class
+	booking.Class = class
 
 	if err := c.r.Create(&booking); err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -75,6 +76,11 @@ func (c BookingController) Delete(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	if _, err := c.r.Find(uint(id)); err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	}
+
 	if err := c.r.Delete(uint(id)); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

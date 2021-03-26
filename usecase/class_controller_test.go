@@ -19,12 +19,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/khaiql/dbcleaner.v2"
 	"gopkg.in/khaiql/dbcleaner.v2/engine"
 	"gorm.io/gorm"
 )
-
-var Cleaner = dbcleaner.New()
 
 type ClassesSuite struct {
 	suite.Suite
@@ -39,11 +36,12 @@ func (s *ClassesSuite) SetupSuite() {
 	db := repository.GetDB()
 	ctx := context.WithValue(context.Background(), factories.DBContextKey, db)
 	s.dbCtx = ctx
+
+	s.routes = gin.Default()
+	router.SetApiRouter(s.routes)
 }
 
 func (s *ClassesSuite) SetupTest() {
-	s.routes = gin.Default()
-	router.SetApiRouter(s.routes)
 	Cleaner.Acquire("classes")
 }
 
